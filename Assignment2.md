@@ -1,0 +1,59 @@
+#Assignment 2.  Working with tabular data in Python
+Submit your completed assignment by e-mail as a Markdown file by May 16, 2017.
+##Background
+The Stanford HIV Drug Resistance Database is an extremely important resource for HIV research and clinical management.  The database holds over 80,000 anonymized patient records collected from around the world.  Screening for the presence of drug resistant variants by generating a nucleotide sequence from the virus genome is standard-of-care and equivalent and more cost-effective than laboratory cell-culture assays.
+##Data source
+Download the tabular HIV RT data set at this link:
+[](https://hivdb.stanford.edu/modules/lookUpFiles/geno-rx-datasets/RT.txt ) https://hivdb.stanford.edu/modules/lookUpFiles/geno-rx-datasets/RT.txt 
+
+and save the file to a location in your filesystem that you can easily navigate to.  I find it helpful to directly download this file to my filesystem instead of attempting to render it in my web browser, by right-clicking on the above URL and selecting "Save Link As..." or whatever the equivalent is for your browser application.  If you're not using a web browser and you're running Linux, you can also use the following command line:
+
+	wget https://hivdb.stanford.edu/modules/lookUpFiles/geno-rx-datasets/RT.txt
+ 
+
+This is a tab-separated values (TSV) file that comprises published HIV reverse transcriptase sequence data that are annotated with patient drug treatment histories and sample collection information, such as country and year of sampling.Use a UNIX command to determine the number of records in this file.  Assume that the first line is the header row.  How many records are there?</p>
+
+	simon@BioLinux-Simon[Python course] wc -l RT.txt
+	112725 RT.txt
+   	#There are 112724 records assuming the first line is a header
+	
+Using an interactive session of Python, open a file stream in read mode to this file and print the collection year for every sample.  (You don't want to stream this output to your console - instead, redirect it into a file on the command line using the <code>&gt;</code> operator.)  Provide your code here:
+
+	#open stream to file and skip header
+	>>> RTdata = open("RT.txt")
+	>>> _ = RTdata.readline()
+	#for loop to strip linebreaks, split at tab separator and output the Year column
+	>>> for line in RTdata:
+	>>>	lines = line.strip("\n").split("\t")
+	>>>	print(lines[4], file=open("output.txt", "a"))
+
+	
+Modify your code to exclude non-numeric characters from the collection year field.  Provide your revised code here:
+
+	#open stream to file and skip header
+	>>> RTdata = open("RT.txt")
+	>>> _ = RTdata.readline()
+	#for loop to strip linebreaks, split at tab separator and output the Year column without spaces, = or > signs at the beginning
+	>>> for line in RTdata:
+	>>>	lines = line.strip("\n").split("\t")
+	>>>	print(lines[4].strip('<=').strip(' '), file=open("output_stripped.txt", "a"))
+		
+Write some Python code that will extract the only the following fields (see header row):
+
+- AccessionID - this is a [GenBank accession number]
+- Region
+- Year
+- Subtype
+- NASeq - this is the HIV nucleotide sequence from the region encoding RT
+
+and print the result as a line of comma-separated values.  Hint: you can assign the list of substrings returned by <code>split</code> to a variable that you can call something like <code>items</code> and then assign specific strings in the list that you want to work to other variables.  To assign the last item, you can use something like <code>last_item = items[-1]</code>
+
+	#import the itemgetter function from the operator module
+	>>> from operator import itemgetter
+	#open stream to file and skip header
+	>>> RTdata = open("RT.txt")
+	>>> _ = RTdata.readline()
+	#similar for loop to above, but uses itemgetter to specify which columns to select and specifices "," as the delimiter in the print command
+	>>> for line in RTdata:
+	>>>	lines = line.strip("\n").split("\t")
+	>>>	print(*itemgetter(-2, 3, 4, 5, -1)(lines), sep=',')
